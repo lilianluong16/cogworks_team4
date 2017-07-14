@@ -1,6 +1,6 @@
 # Imports
 import pickle
-import numpy as np
+import song_class
 
 
 # Constants
@@ -25,6 +25,8 @@ def write_database(filepath=DATABASE_FP):
     """
     with open(filepath, "wb") as f:
         pickle.dump(database, f)
+    global database
+    database = retrieve_database()
 
 
 def add_song(features, name, artist):
@@ -34,7 +36,7 @@ def add_song(features, name, artist):
     :param name: String
     :param artist: String
     """
-    song = (name, artist)
+    song = song_class.Song(name, artist)
     for feat in features:
         if feat in database:
             database[feat].append(song)
@@ -59,7 +61,7 @@ def display_songs():
     Displays songs and artists from database.
     """
     for song in list(get_songs_from_db()):
-        print(song[0], "by", song[1])
+        print(song.name, "by", song.artist)
 
 
 def remove_song(song):
