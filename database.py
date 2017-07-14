@@ -13,6 +13,8 @@ database = {}
 def retrieve_database(filepath=DATABASE_FP):
     """
     Retrieves database dictionary from filepath.
+    :param filepath: filepath of database
+    :return: dictionary of database
     """
     with open(filepath, "rb") as f:
         db = pickle.load(f)
@@ -22,11 +24,10 @@ def retrieve_database(filepath=DATABASE_FP):
 def write_database(filepath=DATABASE_FP):
     """
     Writes database dictionary to filepath.
+    :param filepath: filepath of database
     """
     with open(filepath, "wb") as f:
         pickle.dump(database, f)
-    global database
-    database = retrieve_database()
 
 
 def add_song(features, name, artist):
@@ -47,6 +48,7 @@ def add_song(features, name, artist):
 def get_songs_from_db():
     """
     Retrieves song set from database.
+    :return: List of songs
     """
     songs = set()
     for feature in database.keys():
@@ -81,7 +83,9 @@ def remove_song(song):
 
 def clear_database(password):
     """
-    Clears database with two confirms.
+    Clears database with two confirms. Enter 'y' to confirm when prompted.
+    Remember to write to database afterwards.
+    :param password: String ("yes i am sure")
     """
     if password.lower() == "yes i am sure":
         if input("Are you very sure?").lower() == "y":

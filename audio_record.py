@@ -1,3 +1,4 @@
+# Imports
 from microphone import record_audio
 
 import matplotlib.mlab as mlab
@@ -5,40 +6,36 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
-from scipy.ndimage.filters import maximum_filter
-from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
-from scipy.ndimage.morphology import iterate_structure
-
 
 def record(seconds):
+    """
+    Records a period of sound from the microphone and returns a list of samples.
+    :param seconds: Int, seconds to record for
+    :return: 1-D numpy array of samples
+    """
     byte_encoded_signal, sampling_rate = record_audio(seconds)
-    sample = np.fromstring(byte_encoded_signal, dtype=np.int16)
+    sample = np.hstack(np.fromstring(byte_encoded_signal, dtype=np.int16))
     return sample
 
 
-def local_peaks(data):
-    fp = generate_binary_structure(rank=2, connectivity=1)
-    fp = iterate_structure(fp, 3)
-    local_maxima = maximum_filter(data, footprint=fp)
-    peaks = local_maxima == data
-    return np.logical_and(peaks, local_maxima > 0)
-
-
-def plot_compare(data, peak_finding_function):
-    fig, ax = plt.subplots()
-    peaks = peak_finding_function(data)
-    ax.imshow(peaks)
-    return peaks, data, fig, ax
-
-
 def spectrogram(sample):
+    """
+    Creates spectrogram of a sample.
+    :param sample: 1-D numpy array of samples
+    :return: tuple -> (2-D numpy array of spectrogram indexes, 1-D array of real freq values, 1-D real time values)
+    """
     fig, ax = plt.subplots()
     S, freqs, times, im = ax.specgram(sample, NFFT=4096, Fs=44100,
                                      window=mlab.window_hanning,
                                      noverlap=(4096 // 2))
-    return S
+    return S, freqs, times
 
 
 def get_recording(seconds):
+    """
+    Gets a recording and its spectrogram.
+    :param seconds: Int, seconds to record for
+    :return: tuple -> (2-D numpy array of spectrogram indexes, 1-D array of real freq values, 1-D real time values)
+    """
     ss = record(seconds)
     return spectrogram(ss)
