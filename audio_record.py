@@ -28,6 +28,7 @@ def spectrogram(sample):
     S, freqs, times, im = ax.specgram(sample, NFFT=4096, Fs=44100,
                                      window=mlab.window_hanning,
                                      noverlap=(4096 // 2))
+    plt.close()
     return S, freqs, times
 
 
