@@ -1,6 +1,7 @@
 import librosa
 import numpy as np
-
+from os import listdir
+from os.path import isfile, join
 
 def mp3_to_samparr(songpath):    # WORKS
     
@@ -25,56 +26,36 @@ def mp3_to_samparr(songpath):    # WORKS
     time_arr = np.linspace(0,T,N) # time represents a numpy array of equally spaced time values
     all_list = [samples,N,T,time_arr]
     
-    return all_list
+    return samples
 
 
 def convert_files_to_songpaths(directory_name):          # WORKS
-    
     """
     ACCEPTS: a single string that represents the directory which contains ALL of your songs.
-    
-    
+
     SIDE NOTE: The songs in this directory are in the following format:
-    
-    Name_Artist.mp3
-    
+        Name_Artist.mp3
     
     RETURNS: A list of strings that represent the file paths of each song
-        
     """
-    
-    from os import listdir
-    from os.path import isfile, join
     onlyfiles = [f for f in listdir(directory_name) if isfile(join(directory_name, f))]
-
     str_of_songpaths = []
 
     for i in range(len(onlyfiles)):
-        
         str_of_songpaths.append(directory_name + '\\' +onlyfiles[i])
-        
-    
+
     return str_of_songpaths
-        
-        
-
-
 
 
 def train_database(songpaths_arr):
-    
-    
     """Accept the array of all song paths and register then in the database
     
         New Song = Song(songpath_to_name(songpaths_arr[0]),songpath_to_artist(songpaths_arr[0]),songpaths_arr[0])
-        
     """
-        
-        
+    pass
         
 
 def songpath_to_name(songpath):         # WORKS
-    
     """ACCEPTS: a single string that is a songpath and manipulates it 
     
     NOTE: This function assumes the songpath string is in the following format:
@@ -84,20 +65,16 @@ def songpath_to_name(songpath):         # WORKS
     RETURNS: The name of the song
     
     """
-     
-    
-    
+
+
     the_first = songpath.rfind('\\')
     the_second = songpath.rfind('_')
-    
-    
     
     name = songpath[the_first+1:the_second]
     return name
 
 
 def songpath_to_artist(songpath):         # WORKS
-    
     """ACCEPTS: a single string that is a songpath and manipulates it 
     
     NOTE: This function assumes the songpath string is in the following format:
@@ -107,24 +84,11 @@ def songpath_to_artist(songpath):         # WORKS
     RETURNS: The artist of the song
     
     """
-     
-    
-    
+
     the_first = songpath.rfind('_')
     the_second = songpath.rfind('.')
-    
-    
-    
+
     artist = songpath[the_first+1:the_second]
     return artist
-
-
-
-
-songpath_to_artist('C:\\Users\\Mint\\Documents\\MIT BeaverWorks Cognitive Assistant\\Songs\\Sugar_Maroon 5.mp3')
-
-
-# In[ ]:
-
 
 

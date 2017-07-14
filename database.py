@@ -39,10 +39,10 @@ def add_song(features, name, artist):
     """
     song = song_class.Song(name, artist)
     for feat in features:
-        if feat in database:
-            database[feat].append(song)
+        if feat[0] in database:
+            database[feat[0]].append((song, feat[1]))
         else:
-            database[feat] = [song]
+            database[feat[0]] = [(song, feat[1])]
 
 
 def get_songs_from_db():
