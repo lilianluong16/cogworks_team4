@@ -29,7 +29,7 @@ def find_peaks(song, freqs):
     """
     #generates proper neighborhood
     struct = generate_binary_structure(2, 1)
-    neighborhood = iterate_structure(struct, 20)  # this incorporates roughly 20 nearest neighbors
+    neighborhood = iterate_structure(struct, 25)  # this incorporates roughly 20 nearest neighbors
     #finds foreground
     ys, xs = np.histogram(song.flatten(), bins=len(freqs)//2, normed=True)
     dx = xs[-1] - xs[-2]
@@ -62,13 +62,14 @@ def find_fingerprint(peaks, freqs, times):
         of the form ((f1,f2,delta t), t1)
     """
     song_fp_t = []
-    indices = np.argwhere(peaks == True)
+    indices = np.argwhere(peaks == True)[::-1]
     comparisons = itertools.combinations(indices, 2)
     threshold = 15
-    filtered = itertools.filterfalse(lambda x: abs(times[x[1][1]]- times[x[0][1]]) > threshold, comparisons)
-    for (f1, t1), (f2,t2) in filtered:
-        #print((f1, t1),(f2,t2))
-        song_fp_t.append(tuple([tuple([round(freqs[f1],2), round(freqs[f2],2), round(abs(times[t2] - times[t1]),2)]), round(times[t1],2)]))
+    filtered = itertools.filterfalse(lambda x: abs(x[1][1] - x[1][0]) > threshold, comparisons)
+    for (f1, t1), (f2, t2) in filtered:
+        song_fp_t.append(tuple([tuple([round(freqs[f1], 2), round(freqs[f2], 2), round(abs(times[t2] - times[t1]), 2)]),
+                                round(times[t1], 2)]))
+    print(len(song_fp_t))
     return song_fp_t
 
 
@@ -88,10 +89,10 @@ def get_matches(sample_fp_t, db):
         and the amount of time between the feature occuring in the sample and in the 
     """
     matches = []
-    for feat in sample_fp_t:
-        if feat[0] in db: #feat[0] is the actual finger print of the form (f1,f2,delta t)
-            match = db.get(feat[0])
-            matches += tuple(match[0], round(match[1] - feat[1])) #feat[1] is the time at which the feature occurs
+    for feature, time in sample_fp_t:
+        if feature in db: #feat[0] is the actual finger print of the form (f1,f2,delta t)
+            match = db.get(feature)
+            matches += tuple(match[0], round(match[1] - time)) #feat[1] is the time at which the feature occurs
     return matches
 
 

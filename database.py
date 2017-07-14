@@ -53,13 +53,8 @@ def get_songs_from_db():
     songs = set()
     for feature in database.keys():
         for song in database[feature]:
-<<<<<<< HEAD
             if song[0] not in songs:
                 songs.add(song[0])
-=======
-            if song not in songs:
-                songs.add(song)
->>>>>>> 11aed466ba4d544526f86b70d50bc6df1faa4f54
     return songs
 
 
