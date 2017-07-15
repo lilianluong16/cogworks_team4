@@ -64,12 +64,11 @@ def find_fingerprint(peaks, freqs, times):
     song_fp_t = []
     indices = np.argwhere(peaks == True)[::-1]
     comparisons = itertools.combinations(indices, 2)
-    threshold = 15
-    filtered = itertools.filterfalse(lambda x: abs(x[1][1] - x[1][0]) > threshold, comparisons)
+    threshold = 30
+    filtered = itertools.filterfalse(lambda x: abs(x[1][1] - x[0][1]) > threshold, comparisons)
     for (f1, t1), (f2, t2) in filtered:
-        song_fp_t.append(tuple([tuple([round(freqs[f1], 2), round(freqs[f2], 2), round(abs(times[t2] - times[t1]), 2)]),
-                                round(times[t1], 2)]))
-    print(len(song_fp_t))
+        song_fp_t.append(tuple([tuple([int(freqs[f1]), int(freqs[f2]), int(abs(t2 - t1))]),
+                                int(t1)]))
     return song_fp_t
 
 
@@ -92,7 +91,7 @@ def get_matches(sample_fp_t, db):
     for feature, time in sample_fp_t:
         if feature in db: #feat[0] is the actual finger print of the form (f1,f2,delta t)
             match = db.get(feature)
-            matches += tuple(match[0], round(match[1] - time)) #feat[1] is the time at which the feature occurs
+            matches += [(match[x][0], int(match[x][1] - time)) for x in np.arange(len(match))] #feat[1] is the time at which the feature occurs
     return matches
 
 
@@ -107,10 +106,12 @@ def best_match(matches):
     best_match: song name
         the song name that occurs the most frequently in the list
     """
-    c = Counter(x[0] for x in matches)
-    best_matches = c.most_common(2)
-    threshold = 20
-    if c.get(best_matches[0]) - c.get(best_matches[1]) < threshold:
-        return "Not found"
-    return best_matches[0]
+    if len(matches) < 1:
+        return None
+    c = collections.Counter([x[0] for x in matches])
+    print(c)
+    threshold = 35
+    if c.get(c.most_common(1)[0][0]) < threshold:
+        return None
+    return c.most_common(1)[0][0]
 

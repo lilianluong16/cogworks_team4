@@ -58,6 +58,17 @@ def get_songs_from_db():
     return songs
 
 
+def retrieve_song_features(song_name):
+    feats = set()
+    for feature in database.keys():
+        for song in database[feature]:
+            if song[0].name == song_name:
+                if feature not in feats:
+                    feats.add(feature)
+                break
+    return feats
+
+
 def display_songs():
     """
     Displays songs and artists from database.
