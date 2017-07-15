@@ -95,7 +95,7 @@ def get_matches(sample_fp_t, db):
     return matches
 
 
-def best_match(matches):
+def best_match(matches, displayc=False):
     """
     Find the features (which are each a tuple of two peaks and the distance between them) of a song based on its peaks
     Parameters:
@@ -109,7 +109,8 @@ def best_match(matches):
     if len(matches) < 1:
         return None
     c = collections.Counter([x[0] for x in matches])
-    print(c)
+    if displayc:
+        print(c)
     threshold = 35
     if c.get(c.most_common(1)[0][0]) < threshold:
         return None
