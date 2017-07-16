@@ -91,7 +91,7 @@ def get_matches(sample_fp_t, db):
     for feature, time in sample_fp_t:
         if feature in db: #feat[0] is the actual finger print of the form (f1,f2,delta t)
             match = db.get(feature)
-            matches += [(match[x][0], int(match[x][1] - time)) for x in np.arange(len(match))] #feat[1] is the time at which the feature occurs
+            matches += [(match[x][0], int(match[x][1] - time)) for x in np.arange(len(match)) if int(match[x][1] - time) >= 0] #feat[1] is the time at which the feature occurs
     return matches
 
 
@@ -108,11 +108,13 @@ def best_match(matches, displayc=False):
     """
     if len(matches) < 1:
         return None
-    c = collections.Counter([x[0] for x in matches])
+    c = collections.Counter([x for x in matches])
     if displayc:
         print(c)
-    threshold = 35
+        print(c.most_common(1))
+    threshold = 15
     if c.get(c.most_common(1)[0][0]) < threshold:
         return None
-    return c.most_common(1)[0][0]
+    return c.most_common(1)[0][0][0]
+
 

@@ -77,19 +77,35 @@ def display_songs():
         print(song.name, "by", song.artist)
 
 
+def get_song_object(song_name):
+    song_feature = list(retrieve_song_features(song_name))[0]
+    print(song_feature)
+    return [i[0]
+            for i in database[song_feature]
+            if i[0].name == song_name][0]
+
+
 def remove_song(song):
-    """
-    Removes a song from the database and deletes empty features.
-    :param song: tuple (name, artist)
-    """
     for feature in database.keys():
-        songs = database[feature]
-        if song in songs:
+        song_time_tup = database[feature]
+
+        zipped = zip(*song_time_tup)
+        combined = list(zipped)
+        songs = list(combined[0])
+        times = list(combined[1])
+
+        while song in songs:
+            ind = songs.index(song)
             songs.remove(song)
+            times.remove(times[ind])
+
+        updated = list(zip(songs, times))
+        database[feature] = updated
+
     i = database.copy()
     for k, v in i.items():
         if v == []:
-           del database[k]
+            del database[k]
 
 
 def clear_database(password):
