@@ -8,10 +8,10 @@ from camera import take_picture
 import skimage.io as io 
 import matplotlib.pyplot as plt
 import numpy as np
-
-from dlib_models import download_model, download_predictor
+#uncomment for the first time running on a machine
+"""from dlib_models import download_model, download_predictor
 download_model()
-download_predictor()
+download_predictor()"""
 
 import dlib_models
 from dlib_models import load_dlib_models
