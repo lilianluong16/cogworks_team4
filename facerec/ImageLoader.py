@@ -95,11 +95,11 @@ def find_faces(img_array):
 
     detections = face_detect(img_array, upscale)  # returns sequence of face-detections
     detections = list(detections)
+    if len(detections) > 0:
+        det = detections[0] # first detected face in image
 
-    det = detections[0] # first detected face in image
-
-    # bounding box dimensions for detection
-    l, r, t, b = det.left(), det.right(), det.top(), det.bottom()
+        # bounding box dimensions for detection
+        l, r, t, b = det.left(), det.right(), det.top(), det.bottom()
     return detections
 
 
