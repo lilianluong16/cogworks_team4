@@ -1,20 +1,25 @@
 
 # coding: utf-8
 
+# In[20]:
+
 get_ipython().magic('matplotlib notebook')
 from camera import take_picture
 import skimage.io as io 
 import matplotlib.pyplot as plt
 import numpy as np
-#only necessary the first time it is run on a new machine
-"""from dlib_models import download_model, download_predictor
+
+from dlib_models import download_model, download_predictor
 download_model()
-download_predictor()"""
+download_predictor()
 
 import dlib_models
 from dlib_models import load_dlib_models
 load_dlib_models()
 from dlib_models import models
+
+
+# In[2]:
 
 def get_img_from_camera():
     """
@@ -31,6 +36,9 @@ def get_img_from_camera():
     img_array = take_picture()
     return img_array
 
+
+# In[3]:
+
 def get_img_from_file(filepath):
     """
     Gets an image numpy array from the default camera
@@ -46,6 +54,9 @@ def get_img_from_file(filepath):
     img_array = io.imread(filepath)
     return img_array
 
+
+# In[6]:
+
 def display_img(img_array):
     """
     For testing. Shows the image based on it's numpy array
@@ -59,6 +70,9 @@ def display_img(img_array):
     """
     fig,ax = plt.subplots()
     ax.imshow(img_array)
+
+
+# In[11]:
 
 def find_faces(img_array):
     """
@@ -88,6 +102,9 @@ def find_faces(img_array):
     l, r, t, b = det.left(), det.right(), det.top(), det.bottom()
     return detections
 
+
+# In[22]:
+
 def find_descriptors(img_array, detections):
     """
     Provides descriptors of the faces bounded by the detection boxes in the img array
@@ -112,20 +129,3 @@ def find_descriptors(img_array, detections):
         descriptors.append(descriptor)
     return descriptors
 
-def describe():
-    """
-    Takes a picture and finds the descriptors of each face in it
-    Parameters:
-    -----------
-    None; will use configured camera
-    
-    Returns:
-    --------
-    descriptors (list of numpy arrays):
-        a list of descriptors for each face in the image (has shape (128,))
-    """
-    img = get_img_from_camera()
-    rects = find_faces(img)
-    descriptors = find_descriptors(img, rects)
-    return descriptors
-    
