@@ -129,3 +129,19 @@ def find_descriptors(img_array, detections):
         descriptors.append(descriptor)
     return descriptors
 
+def describe():
+    """
+    Takes a picture and finds the descriptors of each face in it
+    Parameters:
+    -----------
+    None; will use configured camera
+    
+    Returns:
+    --------
+    descriptors (list of numpy arrays):
+        a list of descriptors for each face in the image (has shape (128,))
+    """
+    img = get_img_from_camera()
+    rects = find_faces(img)
+    descriptors = find_descriptors(img, rects)
+    return descriptors
