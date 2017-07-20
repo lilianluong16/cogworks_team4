@@ -32,8 +32,7 @@ def retrieve_database(filepath=DATABASE_FR):
 def write_database(filepath=DATABASE_FR):
     with open(filepath, "wb") as f:
         pickle.dump(database, f)
-
-
+        
 # In[46]:
 
 # Add image to database
@@ -42,20 +41,12 @@ def add_image(descriptor,name=None):
     if name != None:
         
         
-        old_descriptor_list = list(database.get(name))[0]
+        database[name][0].append(descriptor)
         
-        old_descriptor_list.append(descriptor)
-        
-        new_list = old_descriptor_list
-        
-        num_descriptors = len(new_list)
-        
-        temp_arr = np.array(new_list)
-        
-        new_mean = np.sum(temp_arr)/num_descriptors
+        new_mean = np.sum(np.array(database[name][0]), axis=0)/len(database[name][0])
         
     
-        database[name] = [new_list,new_mean]
+        database[name][1] = new_mean
     
 
     if name == None:
@@ -69,6 +60,8 @@ def add_image(descriptor,name=None):
         mean_val = descriptor
         
         database[the_name].append(mean_val)
+        
+    write_database()
         
 
 
@@ -86,7 +79,7 @@ def add_multiple_images(num_detections, descriptors, names):
 # In[48]:
 
 def clear_database(password):
-    if password.lower() == "Yes I am sure":
+    if password.lower() == "yes i am sure":
         if input("Are you very sure?").lower() == "y":
             global database
             database = {}
