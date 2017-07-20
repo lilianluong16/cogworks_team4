@@ -93,9 +93,20 @@ def identify_face(desc, database, threshold=0.5, face_thres=0):
 
 # In[5]:
 
-def compare_faces(detections, descriptors, img, database):
+def compare_faces(descriptors, database):
     """
-    Compares each face with the database.
+    Compares each face with the database and returns a list of detected people.
+
+    Parameters
+    ----------
+    descriptors: list of numpy arrays
+        List of descriptor vectors corresponding to the features of each face.
+    database: dictionary
+        The database containing name keys and a list of descriptor vectors as well as the mean.
+
+    Returns
+    -------
+    list of strings, or None if match not found for that unit
     """
     people = []
     for d in descriptors:
