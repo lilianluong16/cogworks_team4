@@ -110,6 +110,6 @@ def compare_faces(descriptors, database):
     """
     people = []
     for d in descriptors:
-        result = find_face(d, database)
+        result = identify_face(d, database)
         people.append(result)
     return people
