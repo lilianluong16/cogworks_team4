@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 def do_setup():
-    setup(name='facerec',
+    setup(name='Face_Rec',
           version="0.0",
           author='Lilian Luong, Ameer Syedibrahim, Jaden Tennis',
           description='Face database and identifying using Dlib',
