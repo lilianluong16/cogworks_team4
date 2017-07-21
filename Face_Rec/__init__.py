@@ -197,7 +197,7 @@ def identify_face(desc, database, threshold=0.5, face_thres=0):
     None, otherwise
     """
     matches = []
-    for key, data in database.items():
+    for key, data in db.items():
         i_f = is_face(desc, data[1], threshold)
         if i_f is not None:
             matches.append((key, i_f))
@@ -210,7 +210,7 @@ def identify_face(desc, database, threshold=0.5, face_thres=0):
         return matches[0][0]
     return None
 
-def compare_faces(descriptors, database):
+def compare_faces(descriptors, database, threshold=0.4):
     """
     Compares each face with the database and returns a list of detected people.
 
@@ -227,7 +227,7 @@ def compare_faces(descriptors, database):
     """
     people = []
     for d in descriptors:
-        result = identify_face(d, database)
+        result = identify_face(d, database, threshold=threshold)
         people.append(result)
     return people
 
@@ -250,10 +250,14 @@ def new_database(filepath=DATABASE_FR):
 
 new_database(filepath=DATABASE_FR)
 
-def retrieve_database(filepath=DATABASE_FR):
-    with open(filepath, "rb") as f:
-        db = pickle.load(f)
+def retrieve_database():
+    global db
     return db
+
+def read_database():
+    with open(filepath, "rb") as f:
+        global db
+        pickle.load(f)
 
 def write_database(self, filepath=DATABASE_FR):
 
@@ -285,7 +289,7 @@ def add_image(descriptor, name=None):
     Nothing. The purpose of this function is to associate the incoming descriptor with the right name (if present)
     or to ask the user to input a new name and associate it with the incoming descriptor
     """
-
+    global db
     if name != None:
         old_descriptor_list = list(db.get(name))[0]
 
@@ -304,21 +308,11 @@ def add_image(descriptor, name=None):
     if name == None:
         the_name = input("Please enter your name: ")
 
-        the_descriptors = []
-        the_descriptors.append(descriptor)
-
-        db[the_name] = [the_descriptors]
-
-        mean_val = descriptor
-
-        db[the_name].append(mean_val)
-
-        # def add_multiple_images(num_detections, descriptors, names):
-
-
-        # for i in range(num_detections):
-
-        # add_image(descriptors[i],names[i])
+        if the_name in db:
+            add_image(descriptor, name=the_name)
+        else:
+            
+            db[the_name] = [[descriptor], descriptor]
 
 def clear_database(password):
 
