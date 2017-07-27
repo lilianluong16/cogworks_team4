@@ -1,6 +1,7 @@
 import itertools
 import collections
 import pickle
+import librosa
 from os import path, listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -211,16 +212,7 @@ def convert_files_to_songpaths(directory_name):          # WORKS
         str_of_songpaths.append(directory_name + '\\' +onlyfiles[i])
 
     return str_of_songpaths
-
-
-def train_database(songpaths_arr):
-    """Accept the array of all song paths and register then in the database
-    
-        New Song = Song(songpath_to_name(songpaths_arr[0]),songpath_to_artist(songpaths_arr[0]),songpaths_arr[0])
-    """
-    pass
         
-
 def songpath_to_name(songpath):         # WORKS
     """ACCEPTS: a single string that is a songpath and manipulates it 
     
