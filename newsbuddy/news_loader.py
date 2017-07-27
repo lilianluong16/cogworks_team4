@@ -61,7 +61,7 @@ def tokenize(text, preserve_case=True, filter_text=True, stopwords=None, punc=st
         tokens = list(np.delete(np.array(tokens), np.array(indices)))
     if preserve_case:
         return tokens
-    return [i.lower() for i in a]
+    return [i.lower() for i in tokens]
 
 
 def for_ner(url="http://feeds.reuters.com/Reuters/worldNews", filter_text=False):
