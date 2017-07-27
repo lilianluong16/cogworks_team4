@@ -99,5 +99,6 @@ def for_search(url="http://feeds.reuters.com/Reuters/worldNews"):
     """
     articles = get_articles(url)
     tokens = [tokenize(tx, preserve_case=False) for tx in articles]
-    return list(zip(articles, tokens))
+    unfiltered = for_ner()
+    return list(zip(articles, tokens, unfiltered))
 
