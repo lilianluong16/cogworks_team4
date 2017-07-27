@@ -210,7 +210,7 @@ def identify_face(desc, database, threshold=0.5, face_thres=0):
         return matches[0][0]
     return None
 
-def compare_faces(descriptors, database, threshold=0.4):
+def compare_faces(descriptors, database, threshold=0.45):
     """
     Compares each face with the database and returns a list of detected people.
 

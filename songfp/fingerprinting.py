@@ -7,7 +7,6 @@
 import numpy as np
 import itertools
 import collections
-# the imports below could be removed if you didn't wanna visualize things!
 from scipy.ndimage.filters import maximum_filter
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 from scipy.ndimage.morphology import iterate_structure

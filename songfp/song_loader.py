@@ -11,7 +11,7 @@ def mp3_to_samparr(songpath):    # WORKS
     This function samples the song data, records the sampling rate (fs), determines the total length of the audio (T) and
     splits up the total duration into equal intervals (time_arr)
     
-    NOTE: This function assumes the songpath string is in the following format:
+    NOTA BENE: This function assumes the songpath string is in the following format:
     
     'C:\\Users\\Bunch of Directory Stuff\\Name_Artist.mp3'
     
