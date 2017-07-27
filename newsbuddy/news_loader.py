@@ -49,7 +49,7 @@ def tokenize(text, preserve_case=True, filter_text=True, stopwords=None, punc=st
             stops = []
             for line in r:
                 stops += [i.strip() for i in line.split('\t')]
-    stopwords = stops
+        stopwords = stops
     tokens = word_tokenize(text)
     indices = []
     if filter_text:
