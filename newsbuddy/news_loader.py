@@ -64,7 +64,7 @@ def tokenize(text, preserve_case=True, filter_text=True, stopwords=None, punc=st
     return [i.lower() for i in a]
 
 
-def for_ner(url="http://feeds.reuters.com/Reuters/worldNews", filter_text=True):
+def for_ner(url="http://feeds.reuters.com/Reuters/worldNews", filter_text=False):
     """
     Returns tokens as formatted for NER (capitalization preserved).
 
