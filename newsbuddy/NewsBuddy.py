@@ -15,3 +15,11 @@ def start_skill():
     welcome_msg = "Hi! I'm News Buddy. What would you like me to tell you?"
     return question(welcome_msg)
 
+
+@ask.intent("GetTopic")
+def question_one(topic):
+    return statement("I received the phrase: " + topic)
+
+
+if __name__ == '__main__':
+    app.run()
