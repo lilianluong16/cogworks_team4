@@ -189,8 +189,8 @@ def top_related(entity, k=None):
         
     Returns:
     --------
-    out: list(str)
-        the k entities most closely related to the query
+    out: list(tuple(str, int))
+        the k entities most closely related to the query and their count
     """
     global db
     out = db[entity].most_common(k)
@@ -234,8 +234,8 @@ def common_entities(tokenlists, k=None):
         
     Returns:
     --------
-    out: list(str)
-        the k entities most common in the documents
+    out: list(tuple(str, int))
+        the k entities most common in the documents and their counts
     """
     matches = Counter()
     for tokens in tokenlists:
