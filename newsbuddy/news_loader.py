@@ -93,9 +93,10 @@ def for_search(url="http://feeds.reuters.com/Reuters/worldNews"):
     Return
     ------
     List of tuples
-        Tuples length 2:
+        Tuples length 3:
             - String (raw text)
             - List of strings (tokens, lower case)
+            - List of strings (unfiltered tokens)
     """
     articles = get_articles(url)
     tokens = [tokenize(tx, preserve_case=False) for tx in articles]
