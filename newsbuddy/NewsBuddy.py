@@ -20,11 +20,15 @@ def start_skill():
 
 @ask.intent("GetTopic")
 def question_one(topic):
-    return statement("I received the phrase: " + topic)
+    results = main.q1(topic)
+    if results is None:
+        return statement("I couldn't find anything.")
+    return statement("I found this: " + results)
 
 
 @ask.intent("GetEntity")
 def question_two(entity, k=3):
+    main.clear_database()
     main.collect_articles()
     top_results = [i[0] for i in main.q2(entity, k=k)]
     results = ", ".join(top_results)

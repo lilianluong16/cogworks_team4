@@ -1,10 +1,18 @@
 import NER
 import news_loader
+import search_engine
 
 
 def collect_articles():
+    """
+    Collects articles from Reuters and writes to database.
+    """
     NER.update(news_loader.for_ner())
     NER.write_database()
+
+
+def clear_database():
+    NER.clear_database()
 
 
 def q2(ent, k=3):
@@ -22,5 +30,13 @@ def q2(ent, k=3):
     -------
     List of strings
     """
-    return NER.top_related(ent, k=k)
+    if k is None:
+        k = 3
+    return NER.top_related(ent.lower(), k=k)
 
+
+def q1(topic):
+    topic = topic.lower()
+    s_e = search_engine.SearchEngine()
+    s_e.add_all(news_loader.for_search())
+    return s_e.first_sent_highest_doc(topic)
