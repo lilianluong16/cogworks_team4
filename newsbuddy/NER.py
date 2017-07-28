@@ -1,4 +1,3 @@
-
 # coding: utf-8
 
 # In[109]:
@@ -93,16 +92,16 @@ def update_single(extracted):
     counts = Counter(extracted)
     for entity in extracted:
         if entity in db:
-            db[entity].update(counts)
+            db[entity.lower()].update(counts)
             for key, value in counts.items():
                 if not key == entity:
-                    db[entity][key] = value * db[entity][entity]
+                    db[entity.lower()][key] = value * db[entity.lower()][entity]
         else:
-            db[entity] = Counter(extracted)
+            db[entity.lower()] = Counter(extracted)
             for key, value in counts.items():
                 if not key == entity:
-                    db[entity][key] = value * db[entity][entity]
-        del db[entity][entity]
+                    db[entity.lower()][key] = value * db[entity.lower()][entity]
+        del db[entity.lower()][entity]
     return db
 
 
