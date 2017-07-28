@@ -8,6 +8,7 @@ from nltk.tokenize import word_tokenize
 from collections import Counter, defaultdict
 from os import path, makedirs
 
+DATABASE_FR = "data/entities_database.txt"
 
 # In[110]:
 
@@ -88,6 +89,7 @@ def update_single(extracted):
             the database mapping a named entity to the Counter 
             of co-occurences with other entities in the database
     """
+    global db
     counts = Counter(extracted)
     for entity in extracted:
         if entity in db:
@@ -102,11 +104,6 @@ def update_single(extracted):
                     db[entity][key] = value * db[entity][entity]
         del db[entity][entity]
     return db
-
-
-# In[113]:
-
-DATABASE_FR = "data/entities_database.txt"
 
 
 # In[114]:
@@ -196,6 +193,7 @@ def top_related(entity, k=None):
     out: list(str)
         the k entities most closely related to the query
     """
+    global db
     out = db[entity].most_common(k)
     return out
 
@@ -247,3 +245,4 @@ def common_entities(tokenlists, k=None):
     out = matches.most_common(k)
     return out
 
+db = retrieve_database()
