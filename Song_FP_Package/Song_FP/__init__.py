@@ -5,6 +5,7 @@ import librosa
 from os import path, listdir
 from os.path import isfile, join
 from pathlib import Path
+from microphone import record_audio
 import matplotlib.mlab as mlab
 import numpy as np
 from scipy.ndimage.filters import maximum_filter
@@ -12,8 +13,9 @@ from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 from scipy.ndimage.morphology import iterate_structure
 
 _path = Path(path.dirname(path.abspath(__file__)))
+DATABASE_FP = "data/song_features.txt"
 
-__all__ = ["Song", 'record' , 'spectrogram', 'get_recording', 'find_peaks', 'find_fingerprint', 'get_matches', 'best_match', 'train_single', 'train', 'identify']
+__all__ = ["Song", 'record' , 'spectrogram', 'get_recording', 'find_peaks', 'find_fingerprint', 'get_matches', 'best_match', 'train_single', 'train', 'identify', 'retrieve_database', 'write_database', 'add_song', 'get_songs_from_db', 'retrieve_song_features', 'display_songs', 'get_song_object', 'remove_song', 'clear_database', 'initialize']
 
 class Song:
     """This Song class is useful for storing songs in our database as objects and allows for quick retrieval of the song's name,
@@ -253,9 +255,9 @@ def train_single(filepath):
     s_i = mp3_to_samparr(filepath)
     name = songpath_to_name(filepath)
     artist = songpath_to_artist(filepath)
-    spectro_i = audio_record.spectrogram(s_i)
-    peaks_i = fingerprinting.find_peaks(spectro_i[0], spectro_i[1])
-    features = fingerprinting.find_fingerprint(peaks_i, spectro_i[1], spectro_i[2])
+    spectro_i = spectrogram(s_i)
+    peaks_i = find_peaks(spectro_i[0], spectro_i[1])
+    features = find_fingerprint(peaks_i, spectro_i[1], spectro_i[2])
     return name, artist, features
 
 
@@ -265,18 +267,135 @@ def train(folder="audio"):
     for i in filepaths:
         name, artist, features = train_single(i)
         print("Adding:", name, "by", artist)
-        database.add_song(features, name, artist)
+        add_song(features, name, artist)
         print("Added:", name, "by", artist)
-        database.write_database()
+        write_database()
 
 
 def identify():
-    song = audio_record.record(10)
-    spectro_i = audio_record.spectrogram(song)
-    peaks_i = fingerprinting.find_peaks(spectro_i[0], spectro_i[1])
-    features = fingerprinting.find_fingerprint(peaks_i, spectro_i[1], spectro_i[2])
-    matches = fingerprinting.get_matches(features, database.database)
-    best_match = fingerprinting.best_match(matches)
-    if best_match is not None:
-        print(best_match.name, "by", best_match.artist)
-    return best_match
+    song = record(10)
+    spectro_i = spectrogram(song)
+    peaks_i = find_peaks(spectro_i[0], spectro_i[1])
+    features = find_fingerprint(peaks_i, spectro_i[1], spectro_i[2])
+    matches = get_matches(features, database)
+    good_match = best_match(matches)
+    if good_match is not None:
+        print(good_match.name, "by", good_match.artist)
+    return good_match
+
+def retrieve_database(filepath=DATABASE_FP):
+    """
+    Retrieves database dictionary from filepath.
+    :param filepath: filepath of database
+    :return: dictionary of database
+    """
+    with open(filepath, "rb") as f:
+        db = pickle.load(f)
+    return db
+
+
+def write_database(filepath=DATABASE_FP):
+    """
+    Writes database dictionary to filepath.
+    :param filepath: filepath of database
+    """
+    with open(filepath, "wb") as f:
+        pickle.dump(database, f)
+
+
+def add_song(features, name, artist):
+    """
+    Adds song to database.
+    :param features: List of feature tuples.
+    :param name: String
+    :param artist: String
+    """
+    song = song_class.Song(name, artist)
+    for feat in features:
+        if feat[0] in database:
+            database[feat[0]].append((song, feat[1]))
+        else:
+            database[feat[0]] = [(song, feat[1])]
+
+
+def get_songs_from_db():
+    """
+    Retrieves song set from database.
+    :return: List of songs
+    """
+    songs = set()
+    for feature in database.keys():
+        for song in database[feature]:
+            if song[0] not in songs:
+                songs.add(song[0])
+    return songs
+
+
+def retrieve_song_features(song_name):
+    feats = set()
+    for feature in database.keys():
+        for song in database[feature]:
+            if song[0].name == song_name:
+                if feature not in feats:
+                    feats.add(feature)
+                break
+    return feats
+
+
+def display_songs():
+    """
+    Displays songs and artists from database.
+    """
+    for song in list(get_songs_from_db()):
+        print(song.name, "by", song.artist)
+
+
+def get_song_object(song_name):
+    song_feature = list(retrieve_song_features(song_name))[0]
+    print(song_feature)
+    return [i[0]
+            for i in database[song_feature]
+            if i[0].name == song_name][0]
+
+
+def remove_song(song):
+    for feature in database.keys():
+        song_time_tup = database[feature]
+
+        zipped = zip(*song_time_tup)
+        combined = list(zipped)
+        songs = list(combined[0])
+        times = list(combined[1])
+
+        while song in songs:
+            ind = songs.index(song)
+            songs.remove(song)
+            times.remove(times[ind])
+
+        updated = list(zip(songs, times))
+        database[feature] = updated
+
+    i = database.copy()
+    for k, v in i.items():
+        if v == []:
+            del database[k]
+
+
+def clear_database(password):
+    """
+    Clears database with two confirms. Enter 'y' to confirm when prompted.
+    Remember to write to database afterwards.
+    :param password: String ("yes i am sure")
+    """
+    if password.lower() == "yes i am sure":
+        if input("Are you very sure?").lower() == "y":
+            global database
+            database = {}
+
+
+def initialize():
+    """Automatically retrieves database."""
+    global database
+    database = retrieve_database()
+
+initialize()

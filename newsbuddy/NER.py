@@ -193,6 +193,8 @@ def top_related(entity, k=None):
         the k entities most closely related to the query and their count
     """
     global db
+    if entity not in db:
+        return None
     out = db[entity].most_common(k)
     return out
 
