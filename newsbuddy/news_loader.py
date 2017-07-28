@@ -4,14 +4,14 @@ import string
 from nltk import word_tokenize
 
 
-def get_articles(url="http://feeds.reuters.com/Reuters/worldNews", filepath=None):
+def get_articles(url="rss_links.txt", filepath=None):
     """
     Obtains articles from RSS feed of Reuters.
     
     Parameters
     ----------
     url: String
-        URL of Reuters RSS feed.
+        Filepath to URL of Reuters RSS feed.
     filepath: String
         Filepath of place to store articles.
     
@@ -19,8 +19,13 @@ def get_articles(url="http://feeds.reuters.com/Reuters/worldNews", filepath=None
     -------
     List of strings
     """
-    texts = collect_rss.collect(url, filepath)
-    return list(texts.values())
+    thing = []
+    with open(url, 'r') as f:
+        all_links = f.read().splitlines()
+    for link in all_links:
+        texts = collect_rss.collect(link, filepath)
+        thing += list(texts.values())
+    return thing
 
 
 def tokenize(text, preserve_case=True, filter_text=True, stopwords=None, punc=string.punctuation):
@@ -64,7 +69,7 @@ def tokenize(text, preserve_case=True, filter_text=True, stopwords=None, punc=st
     return [i.lower() for i in tokens]
 
 
-def for_ner(url="http://feeds.reuters.com/Reuters/worldNews", filter_text=False):
+def for_ner(url="rss_links.txt", filter_text=False):
     """
     Returns tokens as formatted for NER (capitalization preserved).
 
@@ -81,7 +86,7 @@ def for_ner(url="http://feeds.reuters.com/Reuters/worldNews", filter_text=False)
     return [tokenize(tx, filter_text=filter_text) for tx in articles]
 
 
-def for_search(url="http://feeds.reuters.com/Reuters/worldNews"):
+def for_search(url="rss_links.txt"):
     """
     Returns input formatted for search engine.
 
@@ -100,6 +105,6 @@ def for_search(url="http://feeds.reuters.com/Reuters/worldNews"):
     """
     articles = get_articles(url)
     tokens = [tokenize(tx, preserve_case=False) for tx in articles]
-    unfiltered = for_ner()
+    unfiltered = [tokenize(tx, filter_text=False) for tx in articles]
     return list(zip(articles, tokens, unfiltered))
 

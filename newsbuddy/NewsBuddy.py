@@ -28,13 +28,28 @@ def question_one(topic):
 
 @ask.intent("GetEntity")
 def question_two(entity, k=3):
-    main.clear_database()
-    main.collect_articles()
-    top_results = [i[0] for i in main.q2(entity, k=k)]
+    main.get_data()
+    result = main.q2(entity, k=k)
+    if result is None:
+        return statement("I couldn't find anything.")
+    top_results = [i[0] for i in result]
     results = ", ".join(top_results)
     msg = "Most associated with " + entity + ": " + results
     return statement(msg)
 
 
+@ask.intent("ThirdIntent")
+def question_three(query, k=3):
+    result = main.q3(query, k=k)
+    if result is None:
+        return statement("I couldn't find anything.")
+    top_results = [i[0] for i in result]
+    results = ", ".join(top_results)
+    msg = "Most associated with " + query + ": " + results
+    return statement(msg)
+
+
 if __name__ == '__main__':
+    # main.initialize()
+    main.get_data()
     app.run()
