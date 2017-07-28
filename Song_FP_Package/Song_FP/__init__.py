@@ -15,7 +15,9 @@ from scipy.ndimage.morphology import iterate_structure
 _path = Path(path.dirname(path.abspath(__file__)))
 DATABASE_FP = "data/song_features.txt"
 
-__all__ = ["Song", 'record' , 'spectrogram', 'get_recording', 'find_peaks', 'find_fingerprint', 'get_matches', 'best_match', 'train_single', 'train', 'identify', 'retrieve_database', 'write_database', 'add_song', 'get_songs_from_db', 'retrieve_song_features', 'display_songs', 'get_song_object', 'remove_song', 'clear_database', 'initialize']
+__all__ = ["Song", 'record' , 'spectrogram', 'get_recording', 'find_peaks', 'find_fingerprint', 'get_matches', 'best_match', 
+'train_single', 'train', 'identify', 'retrieve_database', 'write_database', 'add_song', 'get_songs_from_db', 
+'retrieve_song_features', 'display_songs', 'get_song_object', 'remove_song', 'clear_database', 'initialize']
 
 class Song:
     """This Song class is useful for storing songs in our database as objects and allows for quick retrieval of the song's name,
@@ -273,15 +275,15 @@ def train(folder="audio"):
 
 
 def identify():
-    song = record(10)
+    song = record(7)
     spectro_i = spectrogram(song)
     peaks_i = find_peaks(spectro_i[0], spectro_i[1])
     features = find_fingerprint(peaks_i, spectro_i[1], spectro_i[2])
     matches = get_matches(features, database)
     good_match = best_match(matches)
     if good_match is not None:
-        print(good_match.name, "by", good_match.artist)
-    return good_match
+         return " ".join([good_match.name, "by", good_match.artist])
+    return None
 
 def retrieve_database(filepath=DATABASE_FP):
     """

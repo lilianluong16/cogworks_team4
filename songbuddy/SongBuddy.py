@@ -3,49 +3,38 @@ from flask_ask import Ask, statement, question
 import requests
 from Song_FP import *
 
+app = Flask(__name__)
+ask = Ask(app, '/')
+
+initialize()
+global database
+database = retrieve_database()
+
 @app.route('/')
 def homepage():
-    return "Launching analogies"
+    return "Launching song buddy"
 
 @ask.launch
 def start_skill():
-    msg = "What analogy would you like me to solve?"
+    print("Starting song buddy")
+    msg = "Please play your song."
     return question(msg)
 
-def analogythis(thatone, thistwo, thattwo, k=3):
-    """
-    This is to that as thisone is to ?
-    Returns:
-    --------
-    thatone: list(str)
-    """
-    query = glove.wv[thistwo] - glove.wv[thattwo] + glove.wv[thatone]
-    thisone = np.array(glove.wv.similar_by_vector(query))[:k,0].tolist()
-    print(thatone)
-    return thisone
+@ask.intent("YesIntent")
+def identify_song():
+    print("Starting identify")
+    global identitfy
+    result = identify()
+    print("Got result")
+    if result is not None:
+        msg = "This is {}".format(result)
+        return statement(msg)
+    msg = "I didn't find anything. Do you want to try again?"
+    return question(msg)
 
-@ask.intent("ThisIntent")
-def solvethis(thatone, thistwo, thattwo):
-    thisone = ", or ".join(analogythis(thatone, thistwo, thattwo))
-    answer_msg = "{}, is to {}, as {}, is to, {}".format(thisone, thatone, thistwo, thattwo)
-    return statement(answer_msg)
-
-def analogythat(thisone, thistwo, thattwo, k=3):
-    """
-    Returns:
-    --------
-    thatone: list(str)
-    """
-    query = glove.wv[thisone] + glove.wv[thattwo] - glove.wv[thistwo]
-    thatone = np.array(glove.wv.similar_by_vector(query))[:k,0].tolist()
-    print(thatone)
-    return thatone
-
-@ask.intent("ThatIntent")
-def solvethis(thisone, thistwo, thattwo):
-    thatone = ", or ".join(analogythat(thisone, thistwo, thattwo))
-    answer_msg = "{}, is to {}, as {}, is to, {}".format(thisone, thatone, thistwo, thattwo)
-    return statement(answer_msg)
+@ask.intent("NoIntent")
+def goodbye():
+    return statement("Okay. Have a good day!")
 
 if __name__ == '__main__':
     app.run(debug=True)
