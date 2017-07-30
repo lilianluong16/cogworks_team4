@@ -1,0 +1,6 @@
+setup.py
+Face_Rec/__init__.py
+Face_Rec.egg-info/PKG-INFO
+Face_Rec.egg-info/SOURCES.txt
+Face_Rec.egg-info/dependency_links.txt
+Face_Rec.egg-info/top_level.txt

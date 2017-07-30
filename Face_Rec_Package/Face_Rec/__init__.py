@@ -26,6 +26,8 @@ __all__ = ['get_img_from_camera', 'get_img_from_file', 'display_img', 'find_face
 download_model()
 download_predictor()"""
 
+db = {}
+
 def get_img_from_camera():
     """
     Gets an image numpy array from the default camera
@@ -236,8 +238,6 @@ def compare_faces(descriptors, database, threshold=0.45):
 
 DATABASE_FR = "data/facial_features.txt"
 
-db = {}
-
 def new_database(filepath=DATABASE_FR):
     """
     Creates a new text file and folder in the filepath; uses 
@@ -250,16 +250,13 @@ def new_database(filepath=DATABASE_FR):
         with open(filepath, "w+"):
             pass
 
-new_database(filepath=DATABASE_FR)
 
 def retrieve_database():
     global db
+    with open(DATABASE_FR, "rb") as f:
+        db = pickle.load(f)
     return db
 
-def read_database():
-    with open(filepath, "rb") as f:
-        global db
-        pickle.load(f)
 
 def write_database(self, filepath=DATABASE_FR):
 
@@ -270,8 +267,6 @@ def write_database(self, filepath=DATABASE_FR):
     with open(filepath, "wb") as f:
         global db
         pickle.dump(db, f)
-
-write_database(DATABASE_FR)
 
 # Add image to database
 def add_image(descriptor, name=None):
@@ -337,7 +332,6 @@ def initialize():
     global db
     db = retrieve_database()
 
-initialize()
 
 def del_person(name):
 
@@ -381,7 +375,7 @@ def identify(save=True, force_input=False, from_file=False):
         img = get_img_from_file(filepath)
         dets = find_faces(img)
         descs = find_descriptors(img, dets)
-        names = compare_faces(descs, database.database, threshold=0.4)
+        names = compare_faces(descs, db, threshold=0.4)
     if save:
         if len(descs) > 1:
             print("Cannot add multiple people at once.")
@@ -423,7 +417,8 @@ def draw_faces(detections, people, img):
         ax.add_patch(rect)
         if people[i] is not None:
             ax.text(d.left() + 8, d.top() + d.height() + 15, people[i], backgroundcolor='#57FF36', fontsize='5', color='black', weight='bold')
-    plt.show()
+    # plt.show()
+    plt.savefig('static/img.png')
 
 def go():
     """
@@ -439,8 +434,9 @@ def go():
     img = get_img_from_camera()
     dets = find_faces(img)
     descs = find_descriptors(img, dets)
-    compared = compare_faces(descs, database.database)
+    compared = compare_faces(descs, db)
     draw_faces(dets, compared, img)
+    return compared, img
 
 def add_file(filepath):
     """
