@@ -19,6 +19,10 @@ def homepage():
 
 @ask.launch
 def start_skill():
+    """
+    Triggers when skill is called.
+    :return:
+    """
     add_flag = 0
     welcome_msg = "Hi! I'm Photo Buddy. Are you ready to take a photo?"
     return question(welcome_msg)
@@ -36,6 +40,8 @@ def photo():
         """
         global descs
         names, img, ul, descs = Face_Rec.go() # Take photo
+        with open("test.txt", "w") as f:
+            f.write(ul)
 
         names = np.array(names)
         nones = len(names) - np.count_nonzero(names) # Number of unidentifiable faces
@@ -64,6 +70,7 @@ def photo():
                 add_flag = 1
                 global name
                 name = msg
+                print(ul)
                 return question("I see " + msg + ". Would you like to add this to the database?") \
                     .standard_card(title="I see...",
                                    text=msg,
@@ -81,6 +88,7 @@ def photo():
                            text=msg,
                            small_image_url=ul,
                            large_image_url=ul)
+        # END RESPONSES
     else:
         """
         If 'yes' is said in response to being asked to be added to the database.
@@ -93,6 +101,11 @@ def photo():
 
 @ask.intent("NoIntent")
 def no():
+    """
+    Triggered when a word synonymous to "no" is said.
+    Resets add_flag.
+    :return:
+    """
     global add_flag
     add_flag = 0
     return statement("Okay! Maybe next time.")

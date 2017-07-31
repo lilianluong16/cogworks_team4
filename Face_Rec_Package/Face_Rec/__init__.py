@@ -428,7 +428,7 @@ def draw_faces(detections, people, img):
             ax.text(d.left() + 8, d.top() + d.height() + 15, people[i], backgroundcolor='#57FF36', fontsize='5', color='black', weight='bold')
     # plt.show()
     plt.savefig('static/img.png')
-    return cloudinary.uploader.upload('static/img.png')['url']
+    return cloudinary.uploader.upload('static/img.png')['secure_url']
 
 def go():
     """
