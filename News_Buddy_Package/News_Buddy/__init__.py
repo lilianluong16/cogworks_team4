@@ -554,25 +554,25 @@ Returns:
 out: list(str)
     a list of the named entities in the document
 """
-entities = []
-pos = nltk.pos_tag(tokens) # label parts of speech
-named_entities = nltk.ne_chunk(pos, binary=not by_type) # identify named entities
-for i in range(0, len(named_entities)):
-    ents = named_entities.pop()
-    if getattr(ents, 'label', None) != None and ents.label() == "NE": 
-        entities.append(([ne for ne in ents]))
-extracted = np.array(entities)
-if extracted.ndim == 3:
-    final = extracted[:,:,0].tolist()
-else:
-    final = []
-    for entity in extracted:
-        final.append(np.array(entity)[:,0].tolist())
-out = []
-for entity in final:
-    entity = " ".join(entity)
-    out.append(entity)
-return out
+    entities = []
+    pos = nltk.pos_tag(tokens) # label parts of speech
+    named_entities = nltk.ne_chunk(pos, binary=not by_type) # identify named entities
+    for i in range(0, len(named_entities)):
+        ents = named_entities.pop()
+        if getattr(ents, 'label', None) != None and ents.label() == "NE": 
+            entities.append(([ne for ne in ents]))
+    extracted = np.array(entities)
+    if extracted.ndim == 3:
+        final = extracted[:,:,0].tolist()
+    else:
+        final = []
+        for entity in extracted:
+            final.append(np.array(entity)[:,0].tolist())
+    out = []
+    for entity in final:
+        entity = " ".join(entity)
+        out.append(entity)
+    return out
 
 def create_database(filepath=DATABASE_FR):
     """
