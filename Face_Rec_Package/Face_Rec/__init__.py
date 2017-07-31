@@ -9,13 +9,15 @@ import matplotlib.pyplot as plt
 import skimage.io as io
 import dlib_models
 from dlib_models import load_dlib_models
-load_dlib_models()
 from dlib_models import models
 import numpy as np
 from camera import save_camera_config
 import cloudinary
 import cloudinary.uploader
 import cloudinary.api
+
+
+load_dlib_models()
 save_camera_config(port=1, exposure=0.7)
 
 _path = Path(path.dirname(path.abspath(__file__)))
@@ -437,14 +439,21 @@ def go():
     
     Returns:
     --------
-    None; shows the image with captioned faces
+    compared: list of strings
+        Names of everyone found in photo.
+    img: numpy array
+        The image itself.
+    url: string
+        URL of location for img file
+    descs: list of numpy arrays
+        Face descriptors.
     """
     img = get_img_from_camera()
     dets = find_faces(img)
     descs = find_descriptors(img, dets)
     compared = compare_faces(descs, db)
     url = draw_faces(dets, compared, img)
-    return compared, img, url
+    return compared, img, url, descs
 
 def add_file(filepath):
     """
