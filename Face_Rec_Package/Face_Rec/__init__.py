@@ -31,6 +31,16 @@ __all__ = ['get_img_from_camera', 'get_img_from_file', 'display_img', 'find_face
 download_model()
 download_predictor()"""
 
+# TO CHANGE DEFAULT DATA FILE, CHANGE STRING BELOW
+DATABASE_FR = "data/facial_features.txt"
+
+
+# creates data file if it doesn't exist
+if not os.path.exists(DATABASE_FR):
+        os.makedirs('/'.join(str.partition(DATABASE_FR, "/")[:-1]))
+        with open(DATABASE_FR, "w+"):
+            pass
+
 db = {}
 
 def get_img_from_camera():
@@ -240,9 +250,6 @@ def compare_faces(descriptors, database, threshold=0.45):
         people.append(result)
     return people
 
-
-DATABASE_FR = "data/facial_features.txt"
-
 def new_database(filepath=DATABASE_FR):
     """
     Creates a new text file and folder in the filepath; uses 
@@ -413,7 +420,7 @@ def draw_faces(detections, people, img):
         List of the keys/names of people as found by compare_faces(), or None if no match is found.
     img: numpy array, shape (480, 640, 3)
         The array representing the image.
-    
+  
     Returns:
     --------
     None
@@ -436,7 +443,7 @@ def go():
     Parameters:
     -----------
     None
-    
+
     Returns:
     --------
     compared: list of strings
