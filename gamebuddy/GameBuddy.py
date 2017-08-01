@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_ask import Ask, question, statement
 import hangman
+import word_association
 
 app = Flask(__name__)
 ask = Ask(app, '/')
@@ -46,6 +47,12 @@ def get_letter(letter):
         else:
             return question(m)
     return start_skill()
+
+@ask.intent("WordAssocIntent"):
+def start_word_assoc():
+    game = "Word Association"
+    game_state = word_association.Word_Association()
+    
 
 
 if __name__ == '__main__':
