@@ -52,8 +52,10 @@ def get_letter(letter):
 def start_word_assoc():
     game = "Word Association"
     game_state = word_association.Word_Association()
-    
+    return question(game_state.start())
 
+@ask.intent("WordIntent")
+def take_turn
 
 if __name__ == '__main__':
     app.run()
