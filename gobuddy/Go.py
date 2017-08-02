@@ -1,7 +1,16 @@
 import numpy as np
 from scipy.ndimage import label
 from scipy.ndimage.morphology import generate_binary_structure, binary_dilation
+import matplotlib.pyplot as plt
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
+cloudinary.config(
+        cloud_name="luong44976",
+        api_key="165891819185365",
+        api_secret="p2ib0QA6Rl2nK8CNxlBFQeJmoaM"
+    )
 
 class GameState:
     def __init__(self, size=5, board=None, captures=[0,0], moves_played=0, passes=0, move=None, prev_state=None, komi=0):
@@ -26,6 +35,8 @@ class GameState:
     def paint(self):
         print(self)
         print("")
+        # TODO: CREATE AND SAVE IMAGE OF BOARD
+
 
     def get_player(self):
         return self.moves_played % 2 + 1

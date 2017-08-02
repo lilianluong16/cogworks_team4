@@ -2,15 +2,18 @@ from flask import Flask
 from flask_ask import Ask, question, statement
 import pickle
 import numpy as np
-from Monte_Carlo3 import MonteCarlo
+from Monte_Carlo3 import MonteCarlo, Node
+import Go
 
 app = Flask(__name__)
 ask = Ask(app, '/')
 
 monte = None
 state = None
-coordinates = {"x": "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-               "y": np.arange(19, step=-1) + 1}
+SIZE = 5
+coordinates = {"x": "ABCDEFGHIJKLMNOPQRSTUVWXYZ".lower(),
+               "y": np.arange(SIZE, 0, step=-1)}
+
 
 @app.route('/')
 def homepage():
@@ -23,23 +26,21 @@ def start_skill():
     global state
     global coordinates
     state = None
-    with open("mc_5x5.txt", "rb") as f:
-        monte = pickle.load(f)
-    assert isinstance(monte, MonteCarlo)
+    monte.history = [monte.root]
     monte.root.content.captures = 0
-    coordinates["y"] = np.arange(monte.root.content.size, step=-1) + 1
     return question("I'll begin. Let me know when you are ready.")
 
 
 @ask.intent("YesIntent")
 def start_game():
+    global coordinates
     global monte
     global state
     if state is not None:
         return question("Sorry. Please try again.")
     state = monte.root.content
     result, move = monte.get_play()
-    state = result[0]
+    state = result.content
     if move == "P":
         msg = "I'll pass."
     else:
@@ -76,12 +77,11 @@ def move_pass():
     return question(msg)
 
 
-
 @ask.intent("MoveIntent")
 def move(l_coord, n_coord):
     global monte
     global state
-    r = coordinates["y"].index(n_coord)
+    r = coordinates["y"].tolist().index(int(n_coord))
     c = list(coordinates["x"]).index(l_coord)
     result = (r, c)
     result = monte.update(result)
@@ -92,7 +92,7 @@ def move(l_coord, n_coord):
     if state.winner() != 0:
         return end_game()
     result, move = monte.get_play()
-    state = result[0]
+    state = result.content
     if move == "P":
         msg = "I'll pass."
     else:
@@ -117,8 +117,13 @@ def end_game():
     else:
         msg += "Player wins."
     msg += " The score was " + str(scores[0]) + "-" + str(scores[1]) + "."
+    state = None
     return statement(msg)
 
 
 if __name__ == "__main__":
+    with open("mc_5x5.txt", "rb") as f:
+        monte = pickle.load(f)
+    print("Tree loaded.")
+    assert isinstance(monte, MonteCarlo)
     app.run()
