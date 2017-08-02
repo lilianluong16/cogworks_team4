@@ -24,7 +24,7 @@ _path = Path(path.dirname(path.abspath(__file__)))
 
 __all__ = ['get_img_from_camera', 'get_img_from_file', 'display_img', 'find_faces', 'find_descriptors', 
 'describe', 'calc_dist', 'is_face', 'identify_face', 'compare_faces', 'new_database', 'retrieve_database',
-'write_database', 'add_image', 'initialize', 'clear_database' , 'del_person', 'identify', 'draw_faces', 'go', 'add_file']
+'write_database', 'add_image', 'initialize', 'clear_database' , 'del_person', 'identify', 'draw_faces', 'go', 'go_friend', 'add_file']
 
 # uncomment for the first time running on a new machine
 """from dlib_models import download_model, download_predictor
@@ -461,6 +461,28 @@ def go():
     compared = compare_faces(descs, db)
     url = draw_faces(dets, compared, img)
     return compared, img, url, descs
+
+
+def go_friend():
+    """
+    Takes a picture from the configured camera and returns descs, names
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    compared: list of strings
+        Names of everyone found in photo.
+    descs: list of numpy arrays
+        Face descriptors.
+    """
+    img = get_img_from_camera()
+    dets = find_faces(img)
+    descs = find_descriptors(img, dets)
+    compared = compare_faces(descs, db)
+    return compared, descs
+
 
 def add_file(filepath):
     """
