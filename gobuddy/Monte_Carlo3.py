@@ -7,11 +7,11 @@ import Go
 
 
 class MonteCarlo:
-    def __init__(self, root, initial_time=120, calc_time=10, max_moves=1000, c=1.4):
+    def __init__(self, root, initial_time=120, calc_time=7, max_moves=1500, c=1.4):
         self.root = root
         self.calc_time = calc_time
         self.max_moves = max_moves
-        self.c = 1.4
+        self.c = c
         self.history = [root]
         self.wins = {}
         self.plays = {}
@@ -77,7 +77,7 @@ class MonteCarlo:
         move = state.moves[state.children.index(new_move)]
         print("Computer: I'll play ", move)
         self.history.append(new_move)
-        return new_move
+        return new_move, move
 
     def search(self, state):
         temp_hist = self.history[:]
@@ -129,7 +129,7 @@ class Node:
 def start_game(reset=True):
     if reset:
         root = Node(Go.GameState())
-        monte = MonteCarlo(root, 300)
+        monte = MonteCarlo(root, 600)
         with open("mc_5x5.txt", "wb") as f:
             pickle.dump(monte, f)
     else:
@@ -140,7 +140,7 @@ def start_game(reset=True):
     root.content.captures = 0
     state = root.content
     while state.winner() == 0:
-        state = monte.get_play().content
+        state = monte.get_play()[0].content
         state.paint()
         if state.winner() != 0:
             break
@@ -172,6 +172,3 @@ def start_game(reset=True):
         print("Player wins.")
     print("The score was " + str(scores[0]) + "-" + str(scores[1]) + ".")
     return winner
-
-
-start_game()
