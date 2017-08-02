@@ -2,12 +2,22 @@ from flask import Flask
 from flask_ask import Ask, question, statement
 import hangman
 import word_association, ghost
+import gensim
+import time
+from gensim.models.keyedvectors import KeyedVectors
+
 
 app = Flask(__name__)
 ask = Ask(app, '/')
 
 game = None
 game_state = None
+
+t0 = time.time()
+path = "glove.6B.50d.txt.w2v"
+glove = KeyedVectors.load_word2vec_format(path, binary=False)
+t1 = time.time()
+print("loaded word vectors in ", t1-t0)
 
 
 @app.route('/')
@@ -48,23 +58,36 @@ def get_letter(letter):
             return question(m)
     return start_skill()
 
-@ask.intent("WordAssocIntent"):
-def start_word_assoc():
+@ask.intent("WordAssocIntent")
+def start_word_assoc(seed, level):
+    global game
+    global game_state
+    global glove
+    if level is None:
+        level = 1
     game = "Word Association"
-    game_state = word_association.Word_Association()
-    return question(game_state.start())
-
-
-@ask.intent("GhostIntent"):
-def start_ghost():
-    game = "Ghost"
-    the_game = ghost.ghost()
-    
-    the_game.play()
+    game_state = word_association.Word_Association(seed=seed, level=level)
     return question(game_state.start())
 
 @ask.intent("WordIntent")
-def take_turn
+def take_turn(word):
+    global game
+    if game == "Word Association":
+        msg = game_state.take_turn(word)
+        if msg[-1] == '!':
+            return statement(msg)
+        else:
+            return question(msg)
+    else:
+        return("I'm sorry, what game are we playing?")
+
+@ask.intent("GhostIntent")
+def start_ghost():
+    game = "Ghost"
+    game_state = ghost.ghost()
+    
+    game_state.play()
+    return question(game_state.start())
 
 if __name__ == '__main__':
     app.run()
