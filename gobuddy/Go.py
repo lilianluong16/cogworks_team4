@@ -14,7 +14,25 @@ cloudinary.config(
 
 
 class GameState:
+    """
+    GameState represents a single stage of the game, storing the board positions, capture count, moves played, passes,
+    previous move and state (for reference and Ko), and board size.
+    """
     def __init__(self, size=5, board=None, captures=[0,0], moves_played=0, passes=0, move=None, prev_state=None, komi=0):
+        """
+        Initializes GameState.
+
+        Parameters
+        ----------
+        size: int (for one dimension)
+        board: np.ndarray((size, size))
+        captures: list length 2
+        moves_played: int
+        passes: int
+        move: 'P' for pass, tuple(row, col) for move, or None
+        prev_state: np.ndarray((size, size)) previous board positions
+        komi: int
+        """
         self.size = size
         if board is None:
             self.board = np.zeros((size, size))
@@ -34,6 +52,13 @@ class GameState:
         return str(self.board)
 
     def paint(self):
+        """
+        Prints out view of board, creates view using pyplot, and saves to cloudinary.
+
+        Returns
+        -------
+        String: url of uploaded image
+        """
         print(self)
         print("")
         a = self.board[::-1, :]
@@ -52,9 +77,32 @@ class GameState:
         return cloudinary.uploader.upload('img.png')['secure_url']
 
     def get_player(self):
+        """
+        Returns number of player to move.
+
+        Returns
+        -------
+        int (1 or 2)
+        """
         return self.moves_played % 2 + 1
 
     def get_groups(self, player=None):
+        """
+        Labels individual groups of stones, according to player.
+
+        Parameters
+        ----------
+        player: int (optional)
+            the player for which the groups should be labeled
+
+        Returns
+        -------
+        if player is None:
+            list of tuples
+        tuple(np.ndarray((self.size, self.size)), int)
+            array has groups labeled 1, 2, ... etc.
+            int is count of how many groups there are
+        """
         if player is not None:
             b = np.zeros((self.size, self.size))
             b[np.where(self.board == player)] = 1
@@ -70,6 +118,18 @@ class GameState:
         return labels
 
     def get_group_list(self, groups):
+        """
+        Splits a labeled group array into individual array masks displaying only the group and nothing else.
+
+        Parameters
+        ----------
+        groups: tuple(np.ndarray((self.size, self.size)), int)
+            The labeled groups tuple returned by get_groups()
+
+        Returns
+        -------
+        List of arrays length groups[1]
+        """
         l = []
         for i in range(1, groups[1] + 1):
             b = np.zeros((self.size, self.size))
@@ -78,12 +138,37 @@ class GameState:
         return l
 
     def find_perimeter(self, b):
+        """
+        Uses a binary structure to determine the perimeter cells of a group, discounting walls.
+
+        Parameters
+        ----------
+        b: np.ndarray((self.size, self.size))
+            array showing cells to calculate perimeter for.
+
+        Returns
+        -------
+        np.ndarray((self.size, self.size))
+            array with 1s at unoccupied cells neighboring occupied cells
+        """
         fp = generate_binary_structure(2, 1)
         mask = binary_dilation(b, fp).astype(b.dtype)
         perimeter = mask - b
         return perimeter
 
     def count_group_liberties(self, group):
+        """
+        Counts the number of liberties a group has.
+
+        Parameters
+        ----------
+        group: np.ndarray((self.size, self.size))
+            array showing single group for which to count liberties
+
+        Returns
+        -------
+        int
+        """
         perimeter = self.find_perimeter(group)
         filled = perimeter * self.board
         liberties = np.sum(perimeter) - np.count_nonzero(filled)
@@ -112,6 +197,18 @@ class GameState:
         return None
 
     def evaluate(self, num=None):
+        """
+        Evaluates a state's board to execute captures in an ordered manner.
+
+        Parameters
+        ----------
+        num: int
+            order number to evaluate for (0 for self, 1 for opponent)
+
+        Returns
+        -------
+        self
+        """
         groups = self.get_groups()
         one_index = (self.get_player()) % 2
         gl = [None, None]
@@ -158,6 +255,14 @@ class GameState:
         return s
 
     def game_end(self):
+        """
+        Computes winner of game.
+
+        Returns
+        -------
+        tuple(winner, list([score_one, score_two]))
+            winner: -1, if tie; number of winning player, if otherwise
+        """
         scores = self.score()
         if scores[0] == scores[1]:
             return -1, scores
@@ -206,6 +311,15 @@ class GameState:
         return new_board
 
     def gen_moves(self):
+        """
+        Generates list of valid moves from state.
+
+        Returns
+        -------
+        List of tuple(GameState, tuple(row, col))
+            Resultant GameState of move
+            tuple representing move
+        """
         moves = [(self.make_move("P"), "P")]
         for r in range(self.size):
             for c in range(self.size):
@@ -214,19 +328,43 @@ class GameState:
                     moves.append((result, (r, c)))
         return moves
 
-    def valid_states(self):
-        return list(zip(*self.gen_moves()))
-
     def valid_moves(self):
+        """
+        Returns list of valid moves.
+
+        Returns
+        -------
+        List of tuple(row, col)
+        """
         return [m[1] for m in self.gen_moves()]
 
     def winner(self):
+        """
+        Returns winner at current state of game.
+
+        Returns
+        -------
+        int: number of player, or 0 if game not finished
+        """
         if self.passes > 1:
             return self.game_end()[0]
         return 0
 
 
 def two_player_game(size=5):
+    """
+    Starts a human two-player game ran through Python console.
+
+    <<< MAY NOT BE FULLY FUNCTIONAL >>>
+
+    Parameters
+    ----------
+    size: int (one dimension of board)
+
+    Returns
+    -------
+    int: winner
+    """
     state = GameState(size=size)
     state.paint()
 

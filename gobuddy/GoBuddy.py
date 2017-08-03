@@ -22,6 +22,13 @@ def homepage():
 
 @ask.launch
 def start_skill():
+    """
+    Resets MCT for new game.
+
+    Returns
+    -------
+    question
+    """
     global monte
     global state
     global coordinates
@@ -33,6 +40,13 @@ def start_skill():
 
 @ask.intent("YesIntent")
 def start_game():
+    """
+    Makes first move.
+
+    Returns
+    -------
+    question and standard card
+    """
     global coordinates
     global monte
     global state
@@ -57,6 +71,13 @@ def start_game():
 
 @ask.intent("PassIntent")
 def move_pass():
+    """
+    Player passes, and computer moves (if applicable). Displays board in app.
+
+    Returns
+    -------
+    question/statement and standard card
+    """
     global monte
     global state
     mv = "P"
@@ -65,7 +86,11 @@ def move_pass():
         return statement("That move was invalid. Please try again.")
     state = result.content
     if state.winner() != 0:
-        return end_game()
+        img_link = state.paint()
+        return end_game() \
+            .standard_card(title="GoBuddy Game Finished",
+                           small_image_url=img_link,
+                           large_image_url=img_link)
     result, move = monte.get_play()
     state = result[0]
     if move == "P":
@@ -90,6 +115,20 @@ def move_pass():
 
 @ask.intent("MoveIntent")
 def move(l_coord, n_coord):
+    """
+    Player moves, and computer moves in response (if applicable). Displays board in app.
+
+    Parameters
+    ----------
+    l_coord: String
+        lettter corresponding to the column value of move
+    n_coord: String
+        numerical string corresponding to the reverse of the row value of move
+
+    Returns
+    -------
+    question/statement and standard card
+    """
     global monte
     global state
     r = coordinates["y"].tolist().index(int(n_coord))
@@ -100,7 +139,11 @@ def move(l_coord, n_coord):
         return statement("That move was invalid. Please try again.")
     state = result.content
     if state.winner() != 0:
-        return end_game()
+        img_link = state.paint()
+        return end_game() \
+            .standard_card(title="GoBuddy Game Finished",
+                           small_image_url=img_link,
+                           large_image_url=img_link)
     result, move = monte.get_play()
     state = result.content
     if move == "P":
@@ -123,6 +166,13 @@ def move(l_coord, n_coord):
 
 
 def end_game():
+    """
+    Upon game ending, determine winner and return appropriate response.
+
+    Returns
+    -------
+    statement
+    """
     global state
     scores = state.score()
     winner = state.winner()
