@@ -132,7 +132,7 @@ class MonteCarlo:
         t0 = time.time()
         sims = 0
         while time.time() - t0 < t:
-            self.search(state)
+            self.search()
             sims += 1
 
         print("Total searches:", sims)
@@ -160,7 +160,7 @@ class MonteCarlo:
         t0 = time.time()
         sims = 0
         while time.time() - t0 < t:
-            self.search(state)
+            self.search()
             sims += 1
 
         print("Total searches:", sims)
@@ -271,7 +271,7 @@ def create_game(init_time=120, filepath="mc.txt"):
             pickle.dump(monte, f)
 
 
-def start_game(reset=True, init_time=120):
+def start_game(reset=False, init_time=120):
     """
     Starts single player game, with computer going first, using python console.
 
@@ -295,8 +295,10 @@ def start_game(reset=True, init_time=120):
         with open("mc_5x5.txt", "wb") as f:
             pickle.dump(monte, f)
     else:
+        t0 = time.time()
         with open("mc_5x5.txt", "rb") as f:
             monte = pickle.load(f)
+        print(time.time() - t0)
     print("Computer: I'll start.")
     root = monte.root
     root.content.captures = 0
@@ -334,3 +336,5 @@ def start_game(reset=True, init_time=120):
         print("Player wins.")
     print("The score was " + str(scores[0]) + "-" + str(scores[1]) + ".")
     return winner
+
+start_game()
