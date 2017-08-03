@@ -1,32 +1,31 @@
-import time
-import random
-import itertools
+import time, random, itertools
 import numpy as np
 from nltk.corpus import words
 from collections import defaultdict, Counter
 from nltk import word_tokenize
 
 
-class Ghost:
-    """
-    Plays Ghost, a game in which the first player (the computer)
-    says a letter and the other players build off of it towards a word
-    back and forth
-
-    The computer or player loses when they make a word OR
-    say a letter that prevents any word from being formed
-    """
+class ghost:
+    
+    
     def __init__(self):
         """
         Creates an instance of the ghost class.
+
+        Plays Ghost, a game in which the first player (the computer)
+        says a letter and the other players build off of it towards a word
+        back and forth
+
+        The computer or player loses when they make a word OR
+        say a letter that prevents any word from being formed
         """
         with open("english_words.txt") as word_file:
             self.english_words = set(word.strip().lower() for word in word_file)
-        with open("english_words.txt", "r") as f:
-            self.traintext = f.read()
+        with open("english_words.txt" , "r") as f:
+            self.traintext  = f.read()
         self.lm = self.train_lm()
         self.string = ''
-
+    
     def normalize(self, counter):
         """
         Normalizes the given counter by dividing each count by the sum of all the counts
@@ -80,9 +79,10 @@ class Ghost:
                 history += letter
             #print(history)
             first_letter = False
-        lm = {history : self.normalize(counter) for history, counter in raw_lm.items()}
+        lm = { history : self.normalize(counter) for history, counter in raw_lm.items() }
         return lm
-
+        
+        
     def generate_letter(self, history):
         """
         Generates the next letter based on the supplied history
@@ -119,13 +119,11 @@ class Ghost:
 
     def take_turn(self, letter):
         """
-        Completes any turn other than the first, based on 
-        all the previous turns, the model, and the user's last letter
+        Completes any turn other than the first, based on all the previous turns, the model, and the user's last letter
 
         Return:
         str: list
-            all the letters in the word separated by ". " 
-            or a message declaring the winner and why they won
+            all the letters in the word separated by ". " or a message declaring the winner and why they won
         """
         self.string += letter
 
@@ -133,23 +131,24 @@ class Ghost:
             return "Oops you spelt the word " + self.string + "! You lost!"
 
         not_word = True
-        ti = time.time()
+        t0 = time.time()
         for word in sorted(list(self.english_words)):
             if word.startswith(self.string) and len(word) > 3:
                 print(word)
                 not_word = False
-        tf = time.time()
-        print(tf-ti)
+        t1=time.time()
+        print(t1-t0)
 
         if not_word:
-            return "That doesn't spell a word. You lost!"
+            return("That doesn't spell a word. You lost!")
+        
         new_letter = self.generate_letter("~" + self.string)
 
         self.string += new_letter
 
         if new_letter == "~":
             print("got ", new_letter)
-            return "That doesn't spell a word. You lost!"
+            return("That doesn't spell a word. You lost!")
 
         if self.string in self.english_words and len(self.string) > 3:
             return "Oops I spelt the word " + self.string + "! I lost!"
@@ -163,10 +162,10 @@ class Ghost:
         """
         self.string = ""
                     
-game = Ghost()
+game = ghost()
 msg = game.first_turn()
 print(msg)
 while not msg[-1] == "!":
     guess = input("Guess a letter: ")
-    msg = game.take_turn(guess)
+    msg  = game.take_turn(guess)
     print(msg)

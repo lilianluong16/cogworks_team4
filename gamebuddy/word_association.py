@@ -4,6 +4,12 @@ import gensim
 import time
 from gensim.models.keyedvectors import KeyedVectors
 
+t0 = time.time()
+path = "glove.6B.50d.txt.w2v"
+glove = KeyedVectors.load_word2vec_format(path, binary=False)
+t1 = time.time()
+print("loaded word vectors in ", t1-t0)
+
 class Word_Association:
     """
     Capable of playing a simple word association game using word embeddings

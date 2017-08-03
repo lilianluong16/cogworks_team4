@@ -44,11 +44,11 @@ class Hangman:
                 msg += self.tell_word()
                 return msg
         else:
-            return "You've already guessed that."
+            return "You've already guessed " + letter
 
     def end(self, msg):
         if msg is None:
-            m = "Congratulations! The word was " + self.word + ". Let's try again next time!"
+            m = "Congratulations! The word was " + self.word + ". Let's play again later!"
         else:
             m = msg + "The word was " + self.word + ". Try again next time!"
         return m
