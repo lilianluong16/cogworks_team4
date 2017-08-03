@@ -46,9 +46,13 @@ def start_game():
     else:
         l_coord = coordinates["x"][move[1]]
         n_coord = coordinates["y"][move[0]]
-        msg = "I'll play " + l_coord + " " + str(n_coord)
-    state.paint()
-    return question(msg)
+        msg = "I'll play " + l_coord.upper() + " " + str(n_coord)
+    img_link = state.paint()
+    return question(msg) \
+        .standard_card(title="GoBuddy Computer says...",
+                       text=msg,
+                       small_image_url=img_link,
+                       large_image_url=img_link)
 
 
 @ask.intent("PassIntent")
@@ -60,7 +64,6 @@ def move_pass():
     if result is False:
         return statement("That move was invalid. Please try again.")
     state = result.content
-    state.paint()
     if state.winner() != 0:
         return end_game()
     result, move = monte.get_play()
@@ -70,11 +73,19 @@ def move_pass():
     else:
         l_coord = coordinates["x"][move[1]]
         n_coord = coordinates["y"][move[0]]
-        msg = "I'll play " + l_coord + " " + str(n_coord)
-    state.paint()
+        msg = "I'll play " + l_coord.upper() + " " + str(n_coord)
+    img_link = state.paint()
     if state.winner() != 0:
-        return end_game()
-    return question(msg)
+        return end_game() \
+            .standard_card(title="GoBuddy Game Finished",
+                           small_image_url=img_link,
+                           large_image_url=img_link)
+
+    return question(msg) \
+        .standard_card(title="GoBuddy Computer says...",
+                       text=msg,
+                       small_image_url=img_link,
+                       large_image_url=img_link)
 
 
 @ask.intent("MoveIntent")
@@ -88,7 +99,6 @@ def move(l_coord, n_coord):
     if result is False:
         return statement("That move was invalid. Please try again.")
     state = result.content
-    state.paint()
     if state.winner() != 0:
         return end_game()
     result, move = monte.get_play()
@@ -98,11 +108,18 @@ def move(l_coord, n_coord):
     else:
         l_coord = coordinates["x"][move[1]]
         n_coord = coordinates["y"][move[0]]
-        msg = "I'll play " + l_coord + " " + str(n_coord)
-    state.paint()
+        msg = "I'll play " + l_coord.upper() + " " + str(n_coord)
+    img_link = state.paint()
     if state.winner() != 0:
-        return end_game()
-    return question(msg)
+        return end_game() \
+            .standard_card(title="GoBuddy Game Finished",
+                           small_image_url=img_link,
+                           large_image_url=img_link)
+    return question(msg) \
+        .standard_card(title="GoBuddy Computer says...",
+                       text=msg,
+                       small_image_url=img_link,
+                       large_image_url=img_link)
 
 
 def end_game():
