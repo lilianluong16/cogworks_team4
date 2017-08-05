@@ -12,7 +12,7 @@ class MonteCarlo:
     MonteCarlo class is used to represent a game tree built through playouts and simulations, and provides the basis
     for AI selection of moves.
     """
-    def __init__(self, root, initial_time=120, calc_time=7, max_moves=1500, c=1.4):
+    def __init__(self, root, initial_time=120, calc_time=7, max_moves=1500, c=1.4, w=0.1, cnn=1):
         """
         Initialization of MonteCarlo class.
 
@@ -33,6 +33,8 @@ class MonteCarlo:
         self.calc_time = calc_time
         self.max_moves = max_moves
         self.c = c
+        self.w = w
+        self.cnn = cnn
         self.history = [root]
         self.wins = {}
         self.plays = {}
@@ -74,12 +76,14 @@ class MonteCarlo:
         """
         return sum(self.plays.values())
 
-    def win_prob(self, state):
+    def win_prob(self, this_state, state):
         """
         Returns the probability of winning given a node.
 
         Parameters
         ----------
+        this_state: Node
+            node representing current state before move is created
         state: Node
             node representing state for which win probability should be calculated
 
@@ -88,17 +92,21 @@ class MonteCarlo:
         float
         """
         if state in self.plays:
-            return self.wins.get(state, 0) / self.plays[state]
-        return 0
+            return self.wins.get(state, 0) / self.plays[state] + self.w * this_state.weights[this_state.children.index(state)]
+        return self.w * this_state.weights[this_state.children.index(state)]
 
-    def uct(self, state):
+    def uct(self, this_state, state):
         """
         Calculates the UCT (Upper Confidence bound applied to Trees) of a specific state, defined as:
 
             UCT = wins/plays + c * sqrt(ln total_plays / plays)
 
+        and adds weight * w.
+
         Parameters
         ----------
+        this_state: Node
+            node representing current state before move is created
         state: Node
             node representing state for which UCT should be calculated
 
@@ -111,7 +119,7 @@ class MonteCarlo:
         else:
             exploitation = 0
         exploration = self.c * np.sqrt(np.log(self.total_plays()) / self.plays.get(state, 1))
-        return exploitation + exploration
+        return exploitation + exploration + self.w * this_state.weights[this_state.children.index(state)]
 
     def initialize(self, t=None):
         """
@@ -128,7 +136,6 @@ class MonteCarlo:
         """
         if t is None:
             t = self.initial_time
-        state = self.history[-1]
 
         t0 = time.time()
         sims = 0
@@ -165,7 +172,8 @@ class MonteCarlo:
             sims += 1
 
         print("Total searches:", sims)
-        new_move = max(state.children, key=lambda x: self.win_prob(x))
+        new_move = max(state.children, key=lambda x: self.win_prob(state, x))
+        print(self.w * state.weights[state.children.index(new_move)])
         move = state.moves[state.children.index(new_move)]
         print("Computer: I'll play ", move)
         self.history.append(new_move)
@@ -189,7 +197,7 @@ class MonteCarlo:
                 break
             if len(current.children) > 0:
                 # Selection
-                current = max(current.children, key=lambda x: self.uct(x))
+                current = max(current.children, key=lambda x: self.uct(current, x))
                 temp_hist.append(current)
                 continue
             # Expansion
@@ -237,6 +245,7 @@ class Node:
         self.content = content
         self.children = []
         self.moves = []
+        self.weights = []
 
     def get_children(self):
         """
@@ -246,9 +255,11 @@ class Node:
         -------
         None
         """
-        for state, move in self.content.gen_moves():
+        results = self.content.gen_moves()
+        for state, move, weight in results:
             self.children.append(Node(state))
             self.moves.append(move)
+            self.weights.append(weight)
 
 
 def create_game(init_time=120, filepath="mc.txt"):
@@ -293,7 +304,7 @@ def start_game(reset=False, size=5, init_time=240):
     int: winner
     """
     filepath = "mc_" + str(size) + "x" + str(size) + ".txt"
-    sys.setrecursionlimit(3000)
+    sys.setrecursionlimit(6000)
     if reset:
         root = Node(Go.GameState(size))
         monte = MonteCarlo(root, initial_time=init_time)
@@ -306,7 +317,7 @@ def start_game(reset=False, size=5, init_time=240):
         print(time.time() - t0)
     print("Computer: I'll start.")
     root = monte.root
-    root.content.captures = 0
+    root.content.captures = [0, 0]
     state = root.content
     while state.winner() == 0:
         state = monte.get_play()[0].content
@@ -342,4 +353,4 @@ def start_game(reset=False, size=5, init_time=240):
     print("The score was " + str(scores[0]) + "-" + str(scores[1]) + ".")
     return winner
 
-start_game()
+# start_game(reset=True, size=5, init_time=300)
